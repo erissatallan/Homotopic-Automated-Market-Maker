@@ -10,7 +10,8 @@ delta_x = int(sys.argv[4])
 def ln(x):
   return math.log(x)
 
-print("\nMake sure that your arguments are in the order quantity of X, quantity of Y, t, delta x (or delta y)")
+print("\nMake sure that your arguments are in the order quantity of X, quantity of Y, t,
+      delta x (or delta y)")
 
 delta_y = t*y * ( ln( 1/(x + delta_x) + t/y) - ln( 1/x + t/y ) ) \
 -(y/t)*( ln(1 + (t/y) * (x + delta_x) ) - ln( 1 + (t/y) * x ) )
