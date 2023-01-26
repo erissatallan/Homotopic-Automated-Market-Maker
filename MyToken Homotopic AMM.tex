@@ -1,0 +1,233 @@
+ \documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\allowdisplaybreaks
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{color}
+\usepackage[margin=1.25in]{geometry}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\author{Erissat Allan}
+\date{}
+
+\begin{document}
+
+\input{TitlePage.tex}
+
+\section{Preamble}
+For two currencies in a market maker with quantities ${x}$ and ${y}$, the equations defining a CSMM and CPMM are
+$$ a_1x + a_2y = k_1 $$
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=12cm]{csmm1.png}
+    \caption{Graph of a CSMM}
+    \label{fig:CSMM1}
+\end{figure}
+
+$$ b_1x \cdot b_2y = k_2 $$
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=12cm]{cpmm1.png}
+    \caption{Graph of a CPMM. It is symmetrical about $y=x$.}
+    \label{fig:CPMM1}
+\end{figure}
+
+\noindent where their coefficients are positive, real numbers. ${k_1}$ and ${k_2}$ are the constants for the sum and product, respectively. For convenience, we denote these equations as \footnote{Notation borrowed from \cite{port2022mixing}.}${A_0(x,y)} = k_1$ and ${A_1(x,y)} = k_2$, respectively.
+
+\section{Quantity Mechanism: Construction of the Geometric Mean Market Maker}
+Within this section, $a_1$, $a_2$, $b_1$ and $b_2$ are all assumed to be $1$ for simplicity. The optimal values for these constants will be established through \footnote{The model and its simulation are covered in a subsequent paper.}modeling and simulation or actual trial.
+\noindent We define the geometric weighted mean as
+\begin{align*}
+    A_t(x,y) &= A_0(x,y)^{1-t}A_1(x,y)^{t} \\
+    A_t(x,y) &= (x + y)^{1-t}(x \cdot y)^{t} \\
+\end{align*}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=12cm]{gm2.png}
+    \caption{Geometric weighted mean with t=0.  This is $A_0(x,y).$}
+    \label{fig:GM2}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=14cm]{gm3.png}
+    \caption{Geometric weighted mean with t=1. This is $A_1(x,y)$.}
+    \label{fig:GM3}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=12cm]{gm1.png}
+    \caption{Graph of the geometric weighted mean of a CSMM and CPMM. $t=0.35$. This is $A_{0.35}(x,y)$.}
+    \label{fig:GM1}
+\end{figure}
+
+\noindent Notice that this definition is such that when $t=0$, $A_t(x,y)=A_0(x,y)$, the CSMM; and when $t=1$, $A_t(x,y)=A_1(x,y)$, the CPMM.
+
+\vspace{10}
+\noindent This construction, for selected values of the weighting parameter ${t}$, covers the quantity mechanism in the automated market maker. This is because for whatever quantity of currency ${x}$ in the market maker, the equation will give the corresponding quantity of the currency ${y}$.
+It is noteworthy, however, that the market maker equation $A_t(x,y) = c$ cannot easily be written explicitly as one variable in terms of the other (contrasted with purely constant sum or constant product market makers). Consequently, we will devise a mechanism to determine the quantity of one currency for a desired quantity of the other.
+
+
+\section{Exchange Rate Mechanism}
+The exchange rate of currency Y is proportional to the rate of change of the quantity of Y with respect to the quantity of X in the liquidity pool. 
+
+$$ \text{Exchange rate of Y} \propto \frac{dy}{dx} $$
+$$ \text{Exchange rate of Y} = P \cdot \frac{dy}{dx} $$
+
+\noindent The proportionality factor, $P$, potentially a function $P=P(x,y,t)$, is a parameter that is chosen to give desired characteristics to the market maker. For simplicity in the following derivations, this parameter is assigned the value 1. Therefore, for given $x$, $y$, and $t$, the expression $\frac{dy}{dx}$ evaluates to a real number, the exchange rate of currency Y in the value of currency X when $y$ and $x$ are the present quantities of the currencies, respectively.
+
+\noindent We obtain $\frac{dy}{dx}$ as follows
+\begin{equation*}
+\begin{split}
+    & \frac{d}{dx} A_t(x,y) = \frac{d}{dx} k \\[0pt]
+    & \frac{d}{dx} (x + y)^{1-t}(xy)^{t} = \frac{d}{dx} k \\[0pt]
+    & \frac{d}{dx} (x + y)^{1-t} \cdot (xy)^{t} + (x + y)^{1-t} \cdot \frac{d}{dx} (xy)^{t} = 0 \\[3pt]
+    & (1-t)(x + y)^{-t} \frac{d}{dx} (x + y) \cdot (xy)^{t} + (x + y)^{1-t} \cdot t(xy)^{t-1} \frac{d}{dx} (xy) = 0 \\[3pt]
+    & (1-t)(x + y)^{-t}\left(1 + \frac{dy}{dx}\right) \cdot (xy)^{t} + (x + y)^{1-t} \cdot t(xy)^{t-1}\left(y + x\frac{dy}{dx}\right) = 0 \\[3pt]
+    & \frac{ (1-t)(xy)^t(1 + \frac{dy}{dx}) }{(x+y)^t} + \frac{ t(xy)^t(x+y)^{1-t}(y + x\frac{dy}{dx}) }{xy} = 0 \\[3pt]
+    & \text{multiplying by $(x+y)^t(xy)$ and rearranging} \\[3pt]
+    & t(xy)^t(x+y)\left(y + x\frac{dy}{dx}\right) + (1-t)(xy)^{1+t}\left(1 + \frac{dy}{dx}\right) = 0 \\[3pt]
+    & (xy)^t \left[ t(x+y)\left(y + x\frac{dy}{dx}\right) + (1-t)(xy)\left(1 + \frac{dy}{dx} \right) \right] = 0 \\[3pt]
+    & t(x+y)\left(y + x\frac{dy}{dx}\right) + (1-t)(xy)\left(1 + \frac{dy}{dx}\right) = 0 \\[3pt]
+    & xyt + x^2\frac{dy}{dx}t + y^2t + xy\frac{dy}{dx}t + xy + xy\frac{dy}{dx} - xyt - xy\frac{dy}{dx}t = 0 \\[3pt]
+    & \frac{dy}{dx} \left( x^2t + xy \right) + xy + y^2t = 0 \\[3pt]
+    & \frac{dy}{dx} = - \frac{xy+ty^2}{xy+tx^2} \\[0pt]
+\end{split}
+\end{equation*}
+
+\noindent This is the exchange rate for currency Y for quantities $x$, $y$, and weighting factor $t$. Since $A_t(x,y) = c$ is symmetric about $y=x$, that is $A_t(x,y) = (x+y)^{1-t}(xy)^t = (y+x)^{1-t}(yx)^t = A_t(y,x) = c$ ($x$ and $y$ can be interchanged with no effect), then it follows that
+$$ \frac{dx}{dy} = - \frac{xy+tx^2}{xy+ty^2} $$
+
+
+\section{Currency Exchange}
+The section above arrives at the exchange rate given the current quantities of the currencies in the liquidity pool. However, for each unit of one currency exchanged, the exchange rate changes and therefore the rate used before is no longer valid. That is, since $y' = \frac{dy}{dx} = f(x,y,t)$, if we desire to exchange a certain quantity of currency, the present exchange rate, $y'_0 = f(x_0,y_0,t)$, will not apply for this entire quantity since once a unit is exchanged then the quantities have changed to $x_1$ and $y_1$ and the new exchange rate is $y'_1 = f(x_1,y_1,t)$. This section derives an expression for how much of one currency to give in exchange for a given quantity of the other, factoring in the changing exchange rate.
+
+\noindent Say the present quantity of currency X in the liquidity pool is $x$ and an actor in the MyToken ecosystem desires to exchange $\Delta x$ amount of this currency for Y, whose current quantity in the pool is $y$. The quantity of Y to give, $\Delta y$, is determined as follows
+\begin{align*}
+    \Delta y &= \int_{x}^{x+\Delta x} \frac{dy}{dx} dx   \\
+    &= \int_{x}^{x+\Delta x} - \frac{xy+ty^2}{xy+tx^2} dx     \\
+    &= - \int_{x}^{x+\Delta x} \frac{1+t\frac{y}{x}}{1+t\frac{x}{y}} dx     \\
+    &= - \int_{x}^{x+\Delta x} \Bigg[ \frac{1}{1+t\frac{x}{y}} + \frac{ty}{x+\frac{t}{y}x^2} \Bigg] dx    \\
+    &= - \int_{x}^{x+\Delta x} \Bigg[ \frac{1}{1+t\frac{x}{y}} + \frac{ty}{x} - \frac{t^2}{1+\frac{t}{y}x} \Bigg] dx    \\
+    &= - \Bigg[ \frac{y}{t} \ln\left( 1+\frac{t}{y}x \right) + ty \ln(x) - ty \ln\left( 1+\frac{t}{y}x \right) + C \Bigg] \Bigg|_{x}^{x+\Delta x}  \\
+    &= \left[ ty \left( \ln\left( 1+\frac{t}{y}x \right) -\ln(x) \right) - \frac{y}{t} \ln\left( 1+\frac{t}{y}x \right) + C \right] \Bigg|_{x}^{x+\Delta x}  \\
+    &= \Bigg[ ty \ln\left( \frac{1}{x} +\frac{t}{y} \right) - \frac{y}{t} \ln\left( 1+\frac{t}{y}x \right) + C \Bigg] \Bigg|_{x}^{x+\Delta x}     \\
+    &= ty \Bigg[ \ln\left( \frac{1}{x+\Delta x}+\frac{t}{y} \right) - \ln\left( \frac{1}{x}+\frac{t}{y} \right) \Bigg] - \frac{y}{t} \Bigg[ \ln\left( 1+\frac{t}{y}(x+\Delta x)\right) - \ln\left( 1+\frac{t}{y}x \right) \Bigg]    \\
+\end{align*}
+\noindent For real $x$, $y$, and $t$, \footnote{$\Delta y$ is not simplified into a quotient of the terms in the logarithms because this is not computationally simpler: generally, a difference is computationally less intensive than a quotient on a computer.}$\Delta y$ above evaluates to a real number, the quantity of currency Y to exchange for $\Delta x$ given the initial exchange rate.
+
+\section{Liquidity}
+The market is liquid as long as neither currency has quantity 0 in the market maker. In that case, there would be no quantity of that currency to exchange for the other.
+
+\noindent The market maker equation is made to provide liquidity over a wide range of currency quantity values by weighting the constant product term more than the constant sum term. Due to the asymptotes on the extremes of the CPMM curve, a currency becomes asymptotically more valuable as its quantity goes down. This results in the quantity never being 0 in a purely CPMM.
+
+\vspace{0.3cm}
+\noindent Given that the graph of the weighted market maker is symmetric about the origin, we have two situations:
+\begin{enumerate}
+    \item when $t=0$: purely CPMM curve with no axis intercepts (no currency gets to quantity 0)
+    \item when $0<t<1$:
+    $A_t(x,y) &= (a_1x + a_2y)^{1-t}(b_1x \cdot b_2y)^{t}$ has no intercepts (always liquid). The exchange rate of $x$ relative to $y$ is steeper for lesser $t$
+    \item when $t=1$: purely CSMM curve with relatively short range of liquidity (currencies can get to quantity 0 rather fast)
+
+\end{enumerate}
+
+\noindent In conclusion, a weighting factor $t$, $0<t \le 1$, ensures liquidity always.
+
+
+\section{Code implementation and example}
+In python3, the value $\Delta y$ can be obtained by the following
+\begin{lstlisting}
+
+import sys
+import math
+
+x = int(sys.argv[1])
+y = int(sys.argv[2])
+t = float(sys.argv[3])
+delta_x = int(sys.argv[4])
+
+# we represent the natural log function as ln(x) for ease
+def ln(x):
+    return math.log(x)
+
+print("\nMake sure that your arguments are in the order quantity of X, quantity of Y, t, delta x (or delta y)")
+
+delta_y = t*y * ( ln( 1/(x + delta_x) + t/y) - ln( 1/x + t/y ) ) \
+          -(y/t)*( ln(1 + (t/y) * (x + delta_x) ) - ln( 1 + (t/y) * x ) )
+
+print(delta_y)
+
+\end{lstlisting}
+
+\noindent this script is saved as \verb|delta_y.py| for the following illustrations.
+
+\vspace{0.3cm}
+\noindent Suppose the liquidity pool is initiated with a million units of each currency and a weighting factor of $t=0.35$. Someone intends to buy $17290$ units of currency $X$ i.e. $\Delta x = -17290$, what quantity of $Y$ i.e. $\Delta y$ should they give to the pool in exchange?
+
+\vspace{0.3cm}
+\noindent First of all, notice that due to the equality of quantities in the pool, the exchange rate is $-1$
+\begin{align*}
+    \frac{dy}{dx} &= - \frac{xy+ty^2}{xy+tx^2}  \\
+    &= - \frac{(10^6 \times 10^6) + (0.35)(10^6)^2}{(10^6 \times 10^6) + (0.35)(10^6)^2}    \\
+    &= -1   \\
+\end{align*}
+This means that when there is a marginal increase in the quantity of one currency, there is an equal (in the limit) decrease in the quantity of the other. Since the constant that we have chosen to relate price and quantity is $1$, the exchange rate is $-1$ at the beginning.
+
+\noindent Now, 
+\begin{align}
+    A_{0.35}(10^6,10^6) &= A_0(10^6,10^6)^{1-0.35}A_1(10^6,10^6)^{0.35} \nonumber \\
+    &= (10^6 + 10^6)^{0.65}(10^6 \cdot 10^6)^{0.35} \nonumber \\
+    &= 197546571.70636436
+\end{align}
+\noindent This is the constant that should be maintained given the above initial conditions of the pool.
+
+\vspace{0,3cm}
+\noindent Running the following
+\begin{lstlisting}
+    python3 delta_y.py 1000000 1000000 0.35 -17290
+\end{lstlisting}
+
+\noindent which is equivalent to
+$$ \Delta y &= 0.35(10^6) \Bigg[ \ln\left( \frac{1}{10^6-17290}+\frac{0.35}{10^6} \right) - \ln\left( \frac{1}{10^6}+\frac{0.35}{10^6} \right) \Bigg] - \frac{10^6}{0.35} \Bigg[ \ln\left( 1+\frac{0.35}{10^6}(10^6-17290)\right) $$
+$$ \hspace{10cm} - \ln\left(1+\frac{0.35}{10^6}10^6 \right) \Bigg] $$
+
+\noindent gives $\Delta y = 17368.190503495436$.
+
+\vspace{0,3cm}
+\noindent Now, $$A_{0.35}(10^6-17290,10^6+17368.190503495436) = A_{0.35}(982710,1017368.190503495436) = 197536233.54578418$$ is about equal to the constant (1). The error arises from the fact that the \footnote{The fact that $e$ is irrational (hence its decimal places do not terminate) means that $\text{ln}(x), x \ne e \text{ or } 0$ is also irrational (The Gelfond–Schneider theorem).}natural log function evaluates to values with more decimal places than our python script can handle. In actual implementation, more advanced techniques will be employed to enhance precision.
+
+\vspace{0.3cm}
+\noindent Crucial to note is that the actor in this example receives a lesser quantity than that which they give (17290 
+$<$ 17368). This is because as they buy up currency $X$ there is less of it and it becomes more valuable. Each marginal quantity purchased in this transaction makes $X$ marginally more valuable than it was before. This eventually ensures that a currency cannot be bought out in the pool i.e. the pool is always liquid.
+
+\pagebreak
+
+\title{References}
+
+\bibliographystyle{plain}
+\bibliography{mybib}
+ 
+\end{document}
