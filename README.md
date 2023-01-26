@@ -6,7 +6,7 @@ Automated market makers (AMMs) are used in the DeFi space to enforce desired liq
 
 If, instead, a limited supply is desired, a constant sum market maker with the equation $$X + Y = k$$ at its core would be used. This enforces a constant exchange rate and allows for the complete depletion of a token from the pool i.e. $X=0$ or $Y=0$.
 
-Here I describe and characterize an automated market maker arrived at by taking the geometric mean of a Constant Sum Market Maker (CSMM) and a Constant Product Market Maker (CPMM).
+Here I describe and characterize an automated market maker arrived at by taking the geometric mean of a Constant Sum Market Maker (CSMM) and a Constant Product Market Maker (CPMM). Such a configuration gives an AMM that displays characteristics of both a CSMM and a CPMM (the CPMM is dominant). This is desirable since apart from liquidity, which a CPMM will always ensure, a CSMM will perform better by other crypto-economic metrics.
 
 Given the present quantities of the currencies in the liquidity pool, the illustrations herein arrive at the immediate exchange rate between the currencies and the amount of one currency to exchange for some amount of the other (taking into consideration that the exchange rate changes marginally for each marginal amount of currency traded).
 
